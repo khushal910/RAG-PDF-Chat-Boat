@@ -16,14 +16,48 @@ const GetPdf = () => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (pdfFile) {
-      console.log("PDF File:", pdfFile);
 
-      navigate("/chat");
-    } else {
+    if (!pdfFile) {
       alert("Please select a PDF file first");
+
+      return;
+    }
+
+    const upload_api = import.meta.env.VITE_UPLOAD_API;
+
+    if (!upload_api) {
+      console.log("UPLOAD_API is not defined");
+
+      return;
+    }
+
+    try {
+      const formData = new FormData();
+
+      formData.append("file", pdfFile);
+
+      const response = await fetch(upload_api, {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      console.log("Response:", data);
+
+      if (!response.ok) {
+        alert("Upload failed");
+
+        return;
+      }
+
+      alert("PDF uploaded successfully!");
+    } catch (error) {
+      console.error(error);
+
+      alert("Something went wrong");
     }
   };
 
@@ -47,6 +81,7 @@ const GetPdf = () => {
               </span>
               <input
                 className="file-input"
+                name="file"
                 type="file"
                 accept=".pdf"
                 onChange={handleFileChange}
