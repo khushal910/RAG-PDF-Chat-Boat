@@ -1,0 +1,26 @@
+{
+  "name": "ai-pdf",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "frontend": "cd frontend && npm run dev",
+    "backend": "cd backend && python -m uvicorn main:app --reload",
+    "dev": "concurrently -n FRONTEND,BACKEND -c blue,green \"npm run frontend\" \"npm run backend\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/khushal910/RAG-PDF-Chat-Boat.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "concurrently": "^9.0.0"
+  },
+  "bugs": {
+    "url": "https://github.com/khushal910/RAG-PDF-Chat-Boat/issues"
+  },
+  "homepage": "https://github.com/khushal910/RAG-PDF-Chat-Boat#readme"
+}
