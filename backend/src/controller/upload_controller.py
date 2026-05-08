@@ -1,5 +1,6 @@
 from src.utils.text_chunker import chunk_text
 from src.utils.pdf_reader import extract_text_from_pdf
+from src.utils.embedding import create_embeddings
 
 
 async def upload_pdf_controller(file):
@@ -7,8 +8,10 @@ async def upload_pdf_controller(file):
     text = extract_text_from_pdf(file.file)
 
     chunks = chunk_text(text)
+    
+    embeddings = create_embeddings(chunks)
 
     return {
-        "total_chunks": len(chunks),
-        "chunks": chunks
+        'size': len(embeddings),
+        "embeddings": embeddings
     }
