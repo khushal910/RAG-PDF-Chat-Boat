@@ -10,12 +10,13 @@ collection = client.get_or_create_collection(
 )
 
 
-def store_embeddings(chunks, embeddings):
+def store_embeddings(chunks, embeddings, pdf_id):
 
     ids = [str(uuid.uuid4()) for _ in chunks]
 
     collection.add(
         ids=ids,
         documents=chunks,
-        embeddings=embeddings
+        embeddings=embeddings,
+        metadatas=[{"pdf_id": pdf_id} for _ in chunks]
     )

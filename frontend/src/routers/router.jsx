@@ -13,7 +13,7 @@ const router = createBrowserRouter([
     element: <GetPdf />,
   },
   {
-    path: "/chat",
+    path: "/chat/:pdf_id",
     element: <Chat />,
   },
 ]);

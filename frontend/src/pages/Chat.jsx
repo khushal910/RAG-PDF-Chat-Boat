@@ -1,5 +1,74 @@
+import { useState } from "react"
+import { useParams } from "react-router-dom"
 
 const Chat = () => {
+  const { pdf_id } = useParams()
+  const [input, setInput] = useState("")
+  const [messages, setMessages] = useState([
+    {
+      role: "assistant",
+      content:
+        "Your PDF workspace is ready. Ask a question about the uploaded document to begin.",
+    },
+  ])
+  const [isSending, setIsSending] = useState(false)
+  const [error, setError] = useState("")
+
+  const handleSubmit = async (event) => {
+    event.preventDefault()
+
+    const message = input.trim()
+
+    if (!message || isSending) {
+      return
+    }
+
+    const chatApi = import.meta.env.VITE_CHAT_API || "http://localhost:8000/api/chat"
+
+    setInput("")
+    setError("")
+    setIsSending(true)
+    setMessages((currentMessages) => [
+      ...currentMessages,
+      { role: "user", content: message },
+    ])
+
+    try {
+      const response = await fetch(chatApi, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          pdf_id,
+          message,
+        }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.detail || "Chat request failed")
+      }
+
+      setMessages((currentMessages) => [
+        ...currentMessages,
+        { role: "assistant", content: data.message },
+      ])
+    } catch (requestError) {
+      setError(requestError.message)
+      setMessages((currentMessages) => [
+        ...currentMessages,
+        {
+          role: "assistant",
+          content: "I could not get an answer from the backend. Please try again.",
+        },
+      ])
+    } finally {
+      setIsSending(false)
+    }
+  }
+
   return (
     <main className="app-shell">
       <section className="chat-page">
@@ -9,25 +78,28 @@ const Chat = () => {
               <p className="eyebrow">PDF Chat</p>
               <h2>Document conversation</h2>
             </div>
-            <span className="status-pill">Ready</span>
+            <span className="status-pill">{isSending ? "Thinking" : "Ready"}</span>
           </header>
 
           <div className="messages" aria-label="Chat messages">
-            <div className="message assistant">
-              Your PDF workspace is ready. Ask a question about the uploaded
-              document to begin.
-            </div>
-            <div className="message user">Summarize this PDF in simple words.</div>
-            <div className="message assistant">
-              I can help with summaries, key points, follow-up questions, and
-              section-by-section review.
-            </div>
+            {messages.map((chatMessage, index) => (
+              <div className={`message ${chatMessage.role}`} key={`${chatMessage.role}-${index}`}>
+                {chatMessage.content}
+              </div>
+            ))}
+            {error && <p className="chat-error">{error}</p>}
           </div>
 
-          <form className="composer">
-            <input type="text" placeholder="Ask anything about your PDF..." />
-            <button className="button" type="submit">
-              Send
+          <form className="composer" onSubmit={handleSubmit}>
+            <input
+              type="text"
+              value={input}
+              placeholder="Ask anything about your PDF..."
+              onChange={(event) => setInput(event.target.value)}
+              disabled={isSending}
+            />
+            <button className="button" type="submit" disabled={isSending || !input.trim()}>
+              {isSending ? "Sending" : "Send"}
             </button>
           </form>
         </div>

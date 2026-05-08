@@ -45,7 +45,6 @@ const GetPdf = () => {
 
       const data = await response.json();
 
-      console.log("Response:", data);
 
       if (!response.ok) {
         alert("Upload failed");
@@ -53,7 +52,8 @@ const GetPdf = () => {
         return;
       }
 
-      alert("PDF uploaded successfully!");
+      navigate(`/chat/${data.pdf_id}`);
+
     } catch (error) {
       console.error(error);
 
