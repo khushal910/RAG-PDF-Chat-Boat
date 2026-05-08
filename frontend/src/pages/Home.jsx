@@ -29,7 +29,7 @@ const Home = () => {
               <button className="button" onClick={() => navigate("/get-pdf")}>
                 Upload PDF
               </button>
-              <button className="button secondary" onClick={() => navigate("/chat")}>
+              <button className="button secondary" onClick={() => navigate("/get-pdf")}>
                 Open Chat
               </button>
             </div>

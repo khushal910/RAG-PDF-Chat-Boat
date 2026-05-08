@@ -18,5 +18,5 @@ async def upload_pdf_controller(file):
 
     return {
         "message": "PDF processed and stored successfully.",
-        "pdf_id": pdf_id
+        "pdf_id": pdf_id,
     }

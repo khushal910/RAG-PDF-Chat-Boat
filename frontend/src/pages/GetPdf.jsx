@@ -45,8 +45,7 @@ const GetPdf = () => {
 
       const data = await response.json();
 
-
-      if (!response.ok) {
+      if (!response.ok || !data?.pdf_id) {
         alert("Upload failed");
 
         return;

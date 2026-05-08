@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom"
 
 const Chat = () => {
   const { pdf_id } = useParams()
+  const hasPdfId = Boolean(pdf_id)
   const [input, setInput] = useState("")
   const [messages, setMessages] = useState([
     {
@@ -20,6 +21,12 @@ const Chat = () => {
     const message = input.trim()
 
     if (!message || isSending) {
+      return
+    }
+
+    if (!hasPdfId) {
+      setError("Missing PDF ID. Please upload a PDF first.")
+
       return
     }
 
@@ -45,15 +52,25 @@ const Chat = () => {
         }),
       })
 
-      const data = await response.json()
+      const data = await response.json().catch(() => null)
 
       if (!response.ok) {
-        throw new Error(data.detail || "Chat request failed")
+        const detail = Array.isArray(data?.detail)
+          ? data.detail.map((entry) => entry.msg).join(", ")
+          : data?.detail || data?.message || "Chat request failed"
+
+        throw new Error(detail)
+      }
+
+      const assistantMessage = data?.message || data?.answer
+
+      if (!assistantMessage) {
+        throw new Error("Backend did not return a chat message")
       }
 
       setMessages((currentMessages) => [
         ...currentMessages,
-        { role: "assistant", content: data.message },
+        { role: "assistant", content: assistantMessage },
       ])
     } catch (requestError) {
       setError(requestError.message)
@@ -77,6 +94,7 @@ const Chat = () => {
             <div>
               <p className="eyebrow">PDF Chat</p>
               <h2>Document conversation</h2>
+              {!hasPdfId && <p className="chat-error">Upload a PDF before sending a message.</p>}
             </div>
             <span className="status-pill">{isSending ? "Thinking" : "Ready"}</span>
           </header>
