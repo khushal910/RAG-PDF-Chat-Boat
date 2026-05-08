@@ -1,6 +1,7 @@
 from src.utils.text_chunker import chunk_text
 from src.utils.pdf_reader import extract_text_from_pdf
 from src.utils.embedding import create_embeddings
+from src.utils.vector_db import store_embeddings
 
 
 async def upload_pdf_controller(file):
@@ -10,8 +11,9 @@ async def upload_pdf_controller(file):
     chunks = chunk_text(text)
     
     embeddings = create_embeddings(chunks)
+    
+    store_embeddings(chunks, embeddings)
 
     return {
-        'size': len(embeddings),
-        "embeddings": embeddings
+        "message": "PDF processed and stored successfully."
     }
