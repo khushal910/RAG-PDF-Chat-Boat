@@ -1,15 +1,14 @@
+from src.utils.text_chunker import chunk_text
 from src.utils.pdf_reader import extract_text_from_pdf
-from fastapi import UploadFile
-from pypdf import PdfReader
 
 
-async def upload_pdf_controller( file: UploadFile ):
-    
-    extracted_text = extract_text_from_pdf(file.file)
+async def upload_pdf_controller(file):
 
-    print(f"Extracted Text: {extracted_text}")
+    text = extract_text_from_pdf(file.file)
+
+    chunks = chunk_text(text)
+
     return {
-        "filename": file.filename,
-        "content_type": file.content_type,
-        "extracted_text": extracted_text
+        "total_chunks": len(chunks),
+        "chunks": chunks
     }
