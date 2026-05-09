@@ -105,6 +105,16 @@ const Chat = () => {
                 {chatMessage.content}
               </div>
             ))}
+            {isSending && (
+              <div className="message assistant loading-message" role="status" aria-live="polite">
+                <span className="typing-dots" aria-hidden="true">
+                  <span />
+                  <span />
+                  <span />
+                </span>
+                Generating answer...
+              </div>
+            )}
             {error && <p className="chat-error">{error}</p>}
           </div>
 
@@ -117,7 +127,8 @@ const Chat = () => {
               disabled={isSending}
             />
             <button className="button" type="submit" disabled={isSending || !input.trim()}>
-              {isSending ? "Sending" : "Send"}
+              {isSending && <span className="button-spinner" aria-hidden="true" />}
+              {isSending ? "Generating..." : "Send"}
             </button>
           </form>
         </div>

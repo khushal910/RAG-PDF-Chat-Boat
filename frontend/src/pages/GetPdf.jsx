@@ -3,9 +3,14 @@ import { useNavigate } from "react-router-dom";
 
 const GetPdf = () => {
   const [pdfFile, setPdfFile] = useState(null);
+  const [isUploading, setIsUploading] = useState(false);
   const navigate = useNavigate();
 
   const handleFileChange = (e) => {
+    if (isUploading) {
+      return;
+    }
+
     const file = e.target.files[0];
 
     if (file && file.type === "application/pdf") {
@@ -18,6 +23,10 @@ const GetPdf = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (isUploading) {
+      return;
+    }
 
     if (!pdfFile) {
       alert("Please select a PDF file first");
@@ -34,6 +43,8 @@ const GetPdf = () => {
     }
 
     try {
+      setIsUploading(true);
+
       const formData = new FormData();
 
       formData.append("file", pdfFile);
@@ -57,13 +68,23 @@ const GetPdf = () => {
       console.error(error);
 
       alert("Something went wrong");
+    } finally {
+      setIsUploading(false);
     }
   };
 
   return (
     <main className="app-shell">
       <section className="upload-page">
-        <div className="upload-panel">
+        <div className="upload-panel loading-anchor">
+          {isUploading && (
+            <div className="loading-overlay" role="status" aria-live="polite">
+              <span className="spinner" aria-hidden="true" />
+              <strong>Uploading PDF</strong>
+              <span>Preparing your chat workspace...</span>
+            </div>
+          )}
+
           <p className="eyebrow">Upload Document</p>
           <h2>Choose a PDF to start chatting.</h2>
           <p className="lead">
@@ -84,19 +105,22 @@ const GetPdf = () => {
                 type="file"
                 accept=".pdf"
                 onChange={handleFileChange}
+                disabled={isUploading}
               />
             </label>
 
             {pdfFile && <p className="selected-file">Selected: {pdfFile.name}</p>}
 
             <div className="action-row">
-              <button className="button" type="submit">
-                Submit and Go to Chat
+              <button className="button" type="submit" disabled={isUploading}>
+                {isUploading && <span className="button-spinner" aria-hidden="true" />}
+                {isUploading ? "Uploading..." : "Submit and Go to Chat"}
               </button>
               <button
                 className="button secondary"
                 type="button"
                 onClick={() => navigate("/")}
+                disabled={isUploading}
               >
                 Back Home
               </button>
