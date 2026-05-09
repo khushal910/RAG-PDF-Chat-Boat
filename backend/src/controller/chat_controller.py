@@ -1,7 +1,23 @@
+from src.service.vector_service import search_similar_chunks
+from src.utils.embedding import create_embeddings
+from src.service.ai_service import generate_ai_response
+
 async def chat_controller(request):
-    # This is a placeholder for the actual chat logic
-    # You would implement the logic to retrieve the relevant chunks and generate a response based on the query and pdf_id
+
+    message = request.message
+    pdf_id = request.pdf_id
+
+    query_embedding = create_embeddings([message])[0]
+
+    similar_chunks = search_similar_chunks(
+        query_embedding,
+        pdf_id
+    )
+
+    context = "\n".join(similar_chunks)
+
+    ai_answer = generate_ai_response(context, message)
 
     return {
-        "message": f"Received message: {request.message} for PDF ID: {request.pdf_id}"
+        "message": ai_answer
     }
