@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useParams } from "react-router-dom"
 
 const Chat = () => {
@@ -14,6 +14,11 @@ const Chat = () => {
   ])
   const [isSending, setIsSending] = useState(false)
   const [error, setError] = useState("")
+  const messagesEndRef = useRef(null)
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+  }, [messages, isSending, error])
 
   const handleSubmit = async (event) => {
     event.preventDefault()
@@ -87,18 +92,24 @@ const Chat = () => {
   }
 
   return (
-    <main className="app-shell">
-      <section className="chat-page">
-        <div className="chat-panel">
-          <header className="chat-header">
-            <div>
-              <p className="eyebrow">PDF Chat</p>
-              <h2>Document conversation</h2>
-              {!hasPdfId && <p className="chat-error">Upload a PDF before sending a message.</p>}
-            </div>
-            <span className="status-pill">{isSending ? "Thinking" : "Ready"}</span>
-          </header>
+    <main className="chat-shell">
+      <aside className="history-sidebar" aria-label="Chat history">
+        <div className="history-header">
+          <strong>History</strong>
+        </div>
+      </aside>
 
+      <section className="chat-workspace">
+        <header className="chat-page-header">
+          <div>
+            <p className="eyebrow">PDF Chat</p>
+            <h2>Document conversation</h2>
+            {!hasPdfId && <p className="chat-error">Upload a PDF before sending a message.</p>}
+          </div>
+          <span className="status-pill">{isSending ? "Thinking" : "Ready"}</span>
+        </header>
+
+        <div className="chat-panel">
           <div className="messages" aria-label="Chat messages">
             {messages.map((chatMessage, index) => (
               <div className={`message ${chatMessage.role}`} key={`${chatMessage.role}-${index}`}>
@@ -116,6 +127,7 @@ const Chat = () => {
               </div>
             )}
             {error && <p className="chat-error">{error}</p>}
+            <div ref={messagesEndRef} />
           </div>
 
           <form className="composer" onSubmit={handleSubmit}>
