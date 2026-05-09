@@ -109,7 +109,12 @@ const GetPdf = () => {
               />
             </label>
 
-            {pdfFile && <p className="selected-file">Selected: {pdfFile.name}</p>}
+            {pdfFile && (
+              <p className="selected-file" title={pdfFile.name}>
+                <span>Selected:</span>
+                <strong>{pdfFile.name}</strong>
+              </p>
+            )}
 
             <div className="action-row">
               <button className="button" type="submit" disabled={isUploading}>
